@@ -35,6 +35,24 @@ app.get('/movies/read', (req, res)=>{
     res.json({status:200, data:movies})
 }); 
 
+app.get('/movies/read/by-date', (req, res)=>{
+    res.json({status:200, data:movies.sort((a,b)=> a.year - b.year)})
+}); 
+
+app.get('/movies/read/by-rating', (req, res)=>{
+    res.json({status:200, data:movies.sort((a,b)=> b.rating - a.rating)})
+}); 
+
+app.get('/movies/read/by-title', (req, res)=>{
+    res.json({status:200, data:movies.sort((a,b)=> {
+        let title_a = a.title.toUpperCase()
+        let title_b = b.title.toUpperCase()
+        let order = 0
+        title_a < title_b ? order = -1 : order = 1
+        return order;
+    })})
+}); 
+
 app.get('/movies/create', (req, res)=>{
    
 }); 
