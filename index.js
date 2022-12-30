@@ -30,13 +30,11 @@ app.get("/search", (req, res) => {
   const search = req.query.s;
   typeof search != "undefined"
     ? res.json({ status: 200, message: "ok", data: search })
-    : res
-        .status(500)
-        .json({
-          status: 500,
-          error: true,
-          message: "you have to provide a search",
-        });
+    : res.status(500).json({
+        status: 500,
+        error: true,
+        message: "you have to provide a search",
+      });
 });
 
 app.get("/movies/read", (req, res) => {
@@ -47,13 +45,11 @@ app.get("/movies/read/id/:id", (req, res) => {
   const id = req.params.id;
   id && id < movies.length
     ? res.json({ status: 200, data: movies[id] })
-    : res
-        .status(404)
-        .json({
-          status: 404,
-          error: true,
-          message: "the movie <ID> does not exist",
-        });
+    : res.status(404).json({
+        status: 404,
+        error: true,
+        message: "the movie <ID> does not exist",
+      });
 });
 
 app.get("/movies/read/by-date", (req, res) => {
@@ -77,7 +73,25 @@ app.get("/movies/read/by-title", (req, res) => {
   });
 });
 
-app.get("/movies/create", (req, res) => {});
+app.get("/movies/create", (req, res) => {
+  req.query.rating ? req.query.rating : (req.query.rating = "4");
+  let title = req.query.title;
+  let year = req.query.year;
+  let rating = req.query.rating;
+  !title || !year || year.length != 4 || isNaN(year)
+    ? res.json({
+        status: 403,
+        error: true,
+        message:
+          "you cannot create a movie without providing a title and a year",
+      })
+    : movies.push({
+        title: title,
+        year: parseInt(year),
+        rating: parseInt(rating),
+      })
+      res.json({ status: 200, data: movies });
+});
 
 app.get("/movies/update", (req, res) => {});
 
