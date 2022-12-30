@@ -78,24 +78,37 @@ app.get("/movies/create", (req, res) => {
   let title = req.query.title;
   let year = req.query.year;
   let rating = req.query.rating;
-  !title || !year || year.length != 4 || isNaN(year)
-    ? res.json({
-        status: 403,
-        error: true,
-        message:
-          "you cannot create a movie without providing a title and a year",
-      })
-    : movies.push({
-        title: title,
-        year: parseInt(year),
-        rating: parseInt(rating),
-      })
-      res.json({ status: 200, data: movies });
+  if (!title || !year || year.length != 4 || isNaN(year)) {
+    res.json({
+      status: 403,
+      error: true,
+      message: "you cannot create a movie without providing a title and a year",
+    });
+  } else {
+    movies.push({
+      title: title,
+      year: parseInt(year),
+      rating: parseInt(rating),
+    });
+    res.json({ status: 200, data: movies });
+  }
 });
 
 app.get("/movies/update", (req, res) => {});
 
-app.get("/movies/delete", (req, res) => {});
+app.get("/movies/delete/:id", (req, res) => {
+  let id = req.params.id;
+  if (id > movies.length) {
+    res.json({
+      status: 404,
+      error: true,
+      message: "the movie <ID> does not exist",
+    });
+  } else {
+    movies.splice(id-1, 1);
+    res.json({ status: 200, data: movies });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
