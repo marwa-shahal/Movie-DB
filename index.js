@@ -16,6 +16,17 @@ app.get('/time', (req, res)=>{
     res.json({"status":200,"message":`${hours}:${minutes}`})
 }); 
 
+app.get('/hello/:id', (req, res)=>{
+    res.json({"status":200,"message":"Hello,"+req.params.id})
+}); 
+
+app.get('/search', (req, res)=>{
+    const search = req.query.s;
+    typeof search != 'undefined'?res.json({status:200, message:"ok", data:search}):res.json({status:500, error:true, message:"you have to provide a search"})
+    
+    
+}); 
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
