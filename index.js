@@ -94,7 +94,16 @@ app.get("/movies/create", (req, res) => {
   }
 });
 
-app.get("/movies/update", (req, res) => {});
+app.get("/movies/update/:id", (req, res) => {
+    let id = req.params.id;
+    let title = req.query.title;
+    let rating = req.query.rating;
+    let year = req.query.year;
+    title ? movies[id-1].title = title : movies[id-1].title;
+    rating ? movies[id-1].rating = parseInt(rating) : "";
+    year ? movies[id-1].year = parseInt(year) : "";
+    res.json({ status: 200, data: movies });
+});
 
 app.get("/movies/delete/:id", (req, res) => {
   let id = req.params.id;
