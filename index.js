@@ -106,43 +106,44 @@ app.get("/movies/read/id/:id", (req, res) => {
 
 app.get("/movies/read/by-date", (req, res) => {
   movies
-        .find()
-        .then((moviesData) => {
-          res.send({ status: 200, data: movies.sort((a, b) => a.year - b.year) });
-        })
-        .catch((err) => {
-          console.log("error");
-        })
+    .find()
+    .then((moviesData) => {
+      res.send({ status: 200, data: movies.sort((a, b) => a.year - b.year) });
+    })
+    .catch((err) => {
+      console.log("error");
+    });
 });
 
 app.get("/movies/read/by-rating", (req, res) => {
   movies
-        .find()
-        .then((moviesData) => {
-          res.send({ status: 200, data: movies.sort((a, b) => b.rating - a.rating) });
-        })
-        .catch((err) => {
-          console.log("error");
-        })
+    .find()
+    .then((moviesData) => {
+      res.send({
+        status: 200,
+        data: movies.sort((a, b) => b.rating - a.rating),
+      });
+    })
+    .catch((err) => {
+      console.log("error");
+    });
 });
 
 app.get("/movies/read/by-title", (req, res) => {
-  movies
-  .find()
-  .then((moviesData) => {
-    res.send({
-      status: 200,
-      data: movies.sort((a, b) => {
-        let title_a = a.title.toUpperCase();
-        let title_b = b.title.toUpperCase();
-        let order = 0;
-        title_a < title_b ? (order = -1) : (order = 1);
-        return order;
-      })})
-  .catch((err) => 
-    console.log("error")
-  )
-})
+  movies.find().then((moviesData) => {
+    res
+      .send({
+        status: 200,
+        data: movies.sort((a, b) => {
+          let title_a = a.title.toUpperCase();
+          let title_b = b.title.toUpperCase();
+          let order = 0;
+          title_a < title_b ? (order = -1) : (order = 1);
+          return order;
+        }),
+      })
+      .catch((err) => console.log("error"));
+  });
 });
 app.post("/movies/create", (req, res) => {
   req.query.rating ? req.query.rating : (req.query.rating = "4");
@@ -183,28 +184,31 @@ app.put("/movies/update/:id", (req, res) => {
   let title = req.query.title;
   let rating = req.query.rating;
   let year = req.query.year;
-  title ? (movies[id - 1].title = title) : movies[id - 1].title;
-  rating ? (movies[id - 1].rating = parseInt(rating)) : "";
-  year ? (movies[id - 1].year = parseInt(year)) : "";
-  res.json({ status: 200, data: movies });
+  movies.findById(id).then((movie) => {
+    movie.title = title != "" || title != undefined ? title : movie.title;
+    movie.rating = rating != "" && rating != undefined ? rating : movie.rating;
+    movie.year = year != "" && year != undefined ? parseInt(year) : movie.year;
+    movie.save();
+    res
+      .status(200)
+      .json(movie)
+      .catch((error) => res.status(404).send(error));
+  });
 });
 
 app.delete("/movies/delete/:id", (req, res) => {
   let id = req.params.id;
-  if (id > movies.length) {
-    res.status(404).send({
-      status: 404,
-      error: true,
-      message: "the movie <ID> does not exist",
-    });
-  } else {
-    movies.splice(id - 1, 1);
-    res.json({ status: 200, data: movies });
-  }
+  movies.findOneAndDelete({ _id: id }).then((movie) =>
+    res
+      .status(200)
+      .json(movie)
+      .catch((error) =>
+        res.status(404).send("The movie" + id + "doest not found")
+      )
+  );
 });
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-
-
